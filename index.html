@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HF Signature Card Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #07090d;
+    --surface: #0d1117;
+    --surface2: #12171f;
+    --border: #1e2733;
+    --border2: #2a3444;
+    --accent: #00c8ff;
+    --accent2: #0088cc;
+    --green: #00ff41;
+    --red: #ff3333;
+    --text: #c9d1d9;
+    --muted: #4a5568;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-main: 'Rajdhani', sans-serif;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-main);
+    font-size: 15px;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  .logo span { color: var(--green); }
+
+  .header-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  /* LAYOUT */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+
+  .page-sub {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    header { padding: 1rem; }
+    .page-title { font-size: 1.5rem; }
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .panel-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* FORM */
+  .field { margin-bottom: 0.85rem; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-family: var(--font-mono);
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="password"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus { border-color: var(--accent); }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* TOGGLE BUTTONS */
+  .toggle-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .tog {
+    flex: 1;
+    padding: 7px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 12px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tog.on  { background: #011a0a; border-color: var(--green); color: var(--green); }
+  .tog.off { background: #1a0505; border-color: var(--red);   color: var(--red); }
+
+  /* THEME GRID */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .thm {
+    padding: 7px 4px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 11px;
+    font-family: var(--font-mono);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+
+  .thm.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,200,255,0.07);
+  }
+
+  /* RANGE */
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .range-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .range-val {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    min-width: 42px;
+    text-align: right;
+  }
+
+  /* PREVIEW */
+  .preview-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .preview-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .preview-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--green);
+  }
+
+  .live-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .canvas-wrap {
+    background: #111;
+    border-radius: 6px;
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border: 1px solid var(--border);
+  }
+
+  #sig-canvas {
+    display: block;
+    max-width: 100%;
+    image-rendering: crisp-edges;
+    border-radius: 4px;
+  }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 16px;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text);
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .btn:hover { background: var(--border); }
+
+  .btn-accent {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,200,255,0.06);
+  }
+
+  .btn-accent:hover { background: rgba(0,200,255,0.14); }
+
+  .btn-green {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(0,255,65,0.06);
+  }
+
+  .btn-green:hover { background: rgba(0,255,65,0.14); }
+
+  .btn-generate {
+    width: 100%;
+    padding: 13px;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: rgba(0,200,255,0.08);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 1.25rem;
+  }
+
+  .btn-generate:hover {
+    background: rgba(0,200,255,0.18);
+    box-shadow: 0 0 18px rgba(0,200,255,0.12);
+  }
+
+  /* API STATUS */
+  .api-box {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .api-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--muted);
+  }
+
+  .api-dot.ok    { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .api-dot.err   { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+  .api-dot.wait  { background: #ffaa00;       box-shadow: 0 0 6px #ffaa00; }
+
+  /* BBCODE BOX */
+  .bbcode-box {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    word-break: break-all;
+    display: none;
+  }
+
+  .bbcode-box.show { display: block; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    margin-top: 2rem;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* INFO SECTION */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .info-grid { grid-template-columns: 1fr; }
+  }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+
+  .info-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .info-card-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">[HF] <span>SIG</span>CARD_GEN<span>.exe</span></div>
+  <div class="header-badge">v2.0 // free tool</div>
+</header>
+
+<main>
+  <h1 class="page-title">HF Signature Generator</h1>
+  <p class="page-sub">// generate a custom cyber-style forum signature card with your stats</p>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-title">① Fill Your Stats</div>
+      <div class="info-card-body">Enter your HF username, thread count, rep, bytes and latest post — or use the API fetch.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">② Pick a Theme</div>
+      <div class="info-card-body">Choose from 6 cyber themes. Adjust width and tagline to match your style.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">③ Download & Post</div>
+      <div class="info-card-body">Download the PNG or copy the BBCode and paste it directly into your HF signature settings.</div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <span class="preview-label">Live Preview</span>
+      <span class="live-dot">LIVE</span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="sig-canvas" width="560" height="140"></canvas>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="downloadCard()">↓ Download PNG</button>
+      <button class="btn btn-green" onclick="copyBBCode()">⎘ Copy BBCode</button>
+      <button class="btn" onclick="copyImgTag()">⎘ Copy IMG URL</button>
+    </div>
+    <div class="bbcode-box" id="bbcode-out"></div>
+    <div class="api-box" id="api-status">
+      <div class="api-dot" id="api-dot"></div>
+      <span id="api-msg">Ready — fill in your stats and click Generate</span>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="renderCard()">[ GENERATE CARD ]</button>
+
+  <!-- FORM GRID -->
+  <div class="grid">
+    <!-- LEFT: USER STATS -->
+    <div class="panel">
+      <div class="panel-title">User Stats</div>
+
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" value="0xShadow" />
+      </div>
+
+      <div class="field field-row">
+        <div>
+          <label>Thread Count</label>
+          <input type="number" id="threads" value="412" />
+        </div>
+        <div>
+          <label>Post Count</label>
+          <input type="number" id="posts" value="8841" />
+        </div>
+      </div>
+
+      <div class="field field-row">
+        <div>
+          <label>Reputation</label>
+          <input type="number" id="rep" value="2340" />
+        </div>
+        <div>
+          <label>Bytes (Credits)</label>
+          <input type="number" id="bytes" value="19500" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Latest Post Title</label>
+        <input type="text" id="lastpost" value="[TUT] Evading AV with custom shellcode" />
+      </div>
+
+      <div class="field">
+        <label>Rank / Title</label>
+        <input type="text" id="rank" value="Omniscient" />
+      </div>
+
+      <div class="field">
+        <label>Online Status</label>
+        <div class="toggle-row">
+          <button class="tog on" id="btn-online" onclick="setStatus('online')">● Online</button>
+          <button class="tog" id="btn-offline" onclick="setStatus('offline')">○ Offline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: STYLE + API -->
+    <div class="panel">
+      <div class="panel-title">Card Style</div>
+
+      <div class="field">
+        <label>Theme</label>
+        <div class="theme-grid">
+          <button class="thm active" onclick="setTheme('matrix')"  id="t-matrix">Matrix</button>
+          <button class="thm"        onclick="setTheme('neon')"    id="t-neon">Neon Void</button>
+          <button class="thm"        onclick="setTheme('blood')"   id="t-blood">Bloodline</button>
+          <button class="thm"        onclick="setTheme('ice')"     id="t-ice">Ice Grid</button>
+          <button class="thm"        onclick="setTheme('gold')"    id="t-gold">Gold Root</button>
+          <button class="thm"        onclick="setTheme('ghost')"   id="t-ghost">Ghost</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Card Width</label>
+        <div class="range-row">
+          <input type="range" min="400" max="700" value="560" step="10" id="card-width"
+            oninput="document.getElementById('cw-val').textContent=this.value+'px'; renderCard()" />
+          <span class="range-val" id="cw-val">560px</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tagline</label>
+        <input type="text" id="tagline" value="elite | undetected | underground" />
+      </div>
+
+      <div class="field">
+        <label>Avatar Image URL (optional)</label>
+        <input type="text" id="avatarurl" placeholder="https://i.imgur.com/yourimage.png" />
+      </div>
+
+      <div class="panel-title" style="margin-top:1.25rem;">HF API Auto-Fetch</div>
+
+      <div class="field">
+        <label>Your HF User ID</label>
+        <input type="text" id="userid" placeholder="e.g. 1337" />
+      </div>
+
+      <div class="field">
+        <label>HF API Key (optional)</label>
+        <input type="password" id="apikey" placeholder="Paste API key..." />
+      </div>
+
+      <button class="btn btn-accent" style="width:100%; margin-top:4px;" onclick="fetchHFData()">
+        ↗ Fetch Live Stats from HF API
+      </button>
+
+      <p style="font-size:11px; color:var(--muted); margin-top:8px; font-family:var(--font-mono); line-height:1.6;">
+        Requires a server-side proxy to bypass CORS.<br>
+        See README for free Render.com deploy instructions.
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  built for <a href="https://hackforums.net" target="_blank">hackforums.net</a> //
+  open source // no data collected //
+  <a href="https://github.com" target="_blank">github</a>
+</footer>
+
+<script>
+const canvas = document.getElementById('sig-canvas');
+const ctx = canvas.getContext('2d');
+let userStatus = 'online';
+let currentTheme = 'matrix';
+
+const themes = {
+  matrix: { bg:'#020b02', bg2:'#040f04', accent:'#00ff41', accent2:'#00cc33', text:'#a0ffa0', muted:'#3a7a3a', border:'#00ff41', grid:'#0a2a0a', stat:'#00ff41', label:'#3a7a3a', header:'#00ff41' },
+  neon:   { bg:'#050010', bg2:'#0a0020', accent:'#bf00ff', accent2:'#7700bb', text:'#e0aaff', muted:'#4a2060', border:'#bf00ff', grid:'#12003a', stat:'#00bfff', label:'#4a2060', header:'#bf00ff' },
+  blood:  { bg:'#0d0000', bg2:'#180000', accent:'#ff2222', accent2:'#cc0000', text:'#ffaaaa', muted:'#5a1010', border:'#ff2222', grid:'#2a0000', stat:'#ff4444', label:'#5a1010', header:'#ff2222' },
+  ice:    { bg:'#000d1a', bg2:'#001428', accent:'#00c8ff', accent2:'#0088cc', text:'#aaeeff', muted:'#1a4a6a', border:'#00c8ff', grid:'#001e33', stat:'#00eeff', label:'#1a4a6a', header:'#00c8ff' },
+  gold:   { bg:'#0d0900', bg2:'#1a1200', accent:'#ffaa00', accent2:'#cc8800', text:'#ffd880', muted:'#5a3a00', border:'#ffaa00', grid:'#2a1a00', stat:'#ffcc44', label:'#5a3a00', header:'#ffaa00' },
+  ghost:  { bg:'#0a0a0f', bg2:'#12121a', accent:'#8888cc', accent2:'#666699', text:'#ccccee', muted:'#333355', border:'#555577', grid:'#1a1a2a', stat:'#aaaadd', label:'#333355', header:'#8888cc' }
+};
+
+function setStatus(s) {
+  userStatus = s;
+  document.getElementById('btn-online').className  = 'tog' + (s==='online'  ? ' on'  : '');
+  document.getElementById('btn-offline').className = 'tog' + (s==='offline' ? ' off' : '');
+  renderCard();
+}
+
+function setTheme(t) {
+  currentTheme = t;
+  document.querySelectorAll('.thm').forEach(b => b.classList.remove('active'));
+  document.getElementById('t-' + t).classList.add('active');
+  renderCard();
+}
+
+function g(id) { return document.getElementById(id).value; }
+
+function truncate(str, max) { return str.length > max ? str.slice(0, max - 1) + '…' : str; }
+
+function drawGrid(t, W) {
+  ctx.strokeStyle = t.grid; ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 22) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,140); ctx.stroke(); }
+  for (let y = 0; y < 140; y += 22) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+}
+
+function drawHex(t, W) {
+  ctx.strokeStyle = t.grid; ctx.lineWidth = 0.4;
+  const s = 14;
+  for (let row = 0; row * s * 1.5 < 155; row++) {
+    for (let col = 0; col * s * 1.73 < W + s; col++) {
+      const x = col * s * 1.73 + (row%2===0 ? 0 : s*0.87), y = row * s * 1.5;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI/3)*i - Math.PI/6;
+        const px = x + s*0.6*Math.cos(a), py = y + s*0.6*Math.sin(a);
+        i===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
+  }
+}
+
+function drawCircuit(t, W) {
+  ctx.strokeStyle = t.grid; ctx.lineWidth = 0.5;
+  [[20,10,20,70],[20,70,80,70],[80,70,80,30],[80,30,140,30],
+   [W-20,20,W-20,80],[W-20,80,W-80,80],[W-80,80,W-80,40],
+   [10,130,60,130],[60,130,60,100],[60,100,100,100]].forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x2,y2,2,0,Math.PI*2); ctx.fillStyle=t.grid; ctx.fill();
+  });
+}
+
+function renderCard() {
+  const W = parseInt(g('card-width')) || 560;
+  canvas.width = W; canvas.height = 140;
+  const t = themes[currentTheme];
+
+  const username = g('username') || 'Anonymous';
+  const threads  = g('threads')  || '0';
+  const posts    = g('posts')    || '0';
+  const rep      = g('rep')      || '0';
+  const bytes    = g('bytes')    || '0';
+  const lastpost = g('lastpost') || 'N/A';
+  const tagline  = g('tagline')  || '';
+  const rank     = g('rank')     || 'Member';
+
+  ctx.fillStyle = t.bg;
+  ctx.fillRect(0, 0, W, 140);
+
+  if (currentTheme === 'matrix') drawGrid(t, W);
+  else if (currentTheme === 'neon' || currentTheme === 'blood') drawHex(t, W);
+  else drawCircuit(t, W);
+
+  for (let y = 0; y < 140; y += 4) { ctx.fillStyle='rgba(0,0,0,0.1)'; ctx.fillRect(0,y,W,2); }
+
+  ctx.strokeStyle = t.border; ctx.lineWidth = 1.5;
+  ctx.strokeRect(1, 1, W-2, 138);
+  ctx.strokeStyle = t.accent2; ctx.lineWidth = 0.5;
+  ctx.strokeRect(3, 3, W-6, 134);
+
+  const PW = 150;
+  ctx.fillStyle = t.bg2; ctx.fillRect(1, 1, PW, 138);
+  ctx.strokeStyle = t.border; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PW+1, 1); ctx.lineTo(PW+1, 139); ctx.stroke();
+
+  const avatarUrl = g('avatarurl');
+  const drawFallback = () => {
+    ctx.strokeStyle = t.accent; ctx.lineWidth = 1;
+    ctx.strokeRect(46, 12, 60, 60);
+    ctx.fillStyle = t.accent;
+    ctx.font = 'bold 22px "Share Tech Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText((username[0]||'?').toUpperCase(), 76, 48);
+  };
+
+  if (avatarUrl) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      ctx.save(); ctx.beginPath(); ctx.arc(76,42,30,0,Math.PI*2); ctx.clip();
+      ctx.drawImage(img, 46, 12, 60, 60); ctx.restore();
+    };
+    img.onerror = drawFallback;
+    img.src = avatarUrl;
+  } else { drawFallback(); }
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = t.accent;
+  ctx.font = 'bold 13px "Share Tech Mono", monospace';
+  ctx.fillText(truncate(username, 18), 10, 91);
+  ctx.fillStyle = t.muted;
+  ctx.font = '10px "Share Tech Mono", monospace';
+  ctx.fillText(rank.toUpperCase(), 10, 105);
+
+  const online = userStatus === 'online';
+  ctx.beginPath(); ctx.arc(10,116,4,0,Math.PI*2);
+  ctx.fillStyle = online ? '#00ff41' : '#ff4141'; ctx.fill();
+  ctx.fillStyle = online ? '#00ff41' : '#ff4141';
+  ctx.font = '9px "Share Tech Mono", monospace';
+  ctx.fillText(online ? 'ONLINE' : 'OFFLINE', 18, 119);
+
+  ctx.fillStyle = t.muted; ctx.font = '8px "Share Tech Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(truncate(tagline, 22), 76, 133);
+  ctx.textAlign = 'left';
+
+  const sX = PW + 14;
+  const stats = [
+    { label:'THREADS', value: parseInt(threads).toLocaleString() },
+    { label:'POSTS',   value: parseInt(posts).toLocaleString() },
+    { label:'REP',     value: parseInt(rep).toLocaleString() },
+    { label:'BYTES',   value: parseInt(bytes).toLocaleString() }
+  ];
+  const cW = Math.floor((W - PW - 28) / 4);
+
+  stats.forEach((s, i) => {
+    const cx = sX + i * cW;
+    ctx.fillStyle = t.label; ctx.font = '9px "Share Tech Mono", monospace';
+    ctx.fillText(s.label, cx, 22);
+    ctx.fillStyle = t.stat; ctx.font = 'bold 18px "Share Tech Mono", monospace';
+    ctx.fillText(s.value, cx, 42);
+    if (i < 3) {
+      ctx.strokeStyle = t.muted; ctx.lineWidth = 0.5;
+      ctx.setLineDash([2,3]);
+      ctx.beginPath(); ctx.moveTo(cx+cW-4,10); ctx.lineTo(cx+cW-4,50); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  });
+
+  ctx.strokeStyle = t.muted; ctx.lineWidth = 0.5; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(sX,55); ctx.lineTo(W-10,55); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = t.label; ctx.font = '9px "Share Tech Mono", monospace';
+  ctx.fillText('LATEST POST', sX, 70);
+  ctx.fillStyle = t.text; ctx.font = '11px "Share Tech Mono", monospace';
+  ctx.fillText(truncate(lastpost, Math.floor((W-PW-28)/7)), sX, 84);
+
+  ctx.strokeStyle = t.muted; ctx.lineWidth = 0.5; ctx.setLineDash([3,4]);
+  ctx.beginPath(); ctx.moveTo(sX,92); ctx.lineTo(W-10,92); ctx.stroke();
+  ctx.setLineDash([]);
+
+  const now = new Date();
+  const ts = `${now.getUTCFullYear()}-${String(now.getUTCMonth()+1).padStart(2,'0')}-${String(now.getUTCDate()).padStart(2,'0')} ${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} UTC`;
+  ctx.fillStyle = t.muted; ctx.font = '8px "Share Tech Mono", monospace';
+  ctx.fillText('GEN: ' + ts, sX, 103);
+  ctx.fillStyle = t.label; ctx.fillText('hackforums.net', sX, 116);
+  ctx.fillStyle = t.accent2; ctx.textAlign = 'right';
+  ctx.fillText('[SIG CARD v2.0]', W-10, 116);
+  ctx.textAlign = 'left';
+
+  setApiStatus('ready', 'Card generated — download or copy BBCode below');
+}
+
+function downloadCard() {
+  renderCard();
+  setTimeout(() => {
+    const a = document.createElement('a');
+    a.download = 'hf-sig-' + (g('username')||'card') + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }, 100);
+}
+
+function copyBBCode() {
+  renderCard();
+  setTimeout(() => {
+    const url = canvas.toDataURL('image/png');
+    const code = `[img]${url}[/img]`;
+    navigator.clipboard.writeText(code).then(() => {
+      const out = document.getElementById('bbcode-out');
+      out.textContent = code.slice(0, 120) + '... [copied to clipboard]';
+      out.classList.add('show');
+      setApiStatus('ok', 'BBCode copied to clipboard — paste into your HF signature settings');
+    });
+  }, 100);
+}
+
+function copyImgTag() {
+  renderCard();
+  setTimeout(() => {
+    const url = canvas.toDataURL('image/png');
+    navigator.clipboard.writeText(url).then(() => {
+      setApiStatus('ok', 'Image data URL copied — paste as <img src="..."> in HTML');
+    });
+  }, 100);
+}
+
+function setApiStatus(type, msg) {
+  const dot = document.getElementById('api-dot');
+  const msgEl = document.getElementById('api-msg');
+  dot.className = 'api-dot' + (type==='ok' ? ' ok' : type==='err' ? ' err' : type==='wait' ? ' wait' : '');
+  msgEl.textContent = msg;
+}
+
+async function fetchHFData() {
+  const uid = g('userid');
+  if (!uid) { setApiStatus('err', 'Enter a User ID first'); return; }
+  setApiStatus('wait', 'Fetching from HF API...');
+  try {
+    // If you deploy server.js proxy, replace with your Render URL:
+    // const res = await fetch(`https://YOUR-APP.onrender.com/api/user/${uid}`);
+    const apikey = g('apikey');
+    const headers = {};
+    if (apikey) headers['Authorization'] = `Bearer ${apikey}`;
+    const res = await fetch(`https://hackforums.net/api/v1/user/${uid}`, { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status} — try the proxy server (see README)`);
+    const data = await res.json();
+    if (data && data.result) {
+      const u = data.result;
+      if (u.username)        document.getElementById('username').value = u.username;
+      if (u.threadcount !== undefined) document.getElementById('threads').value = u.threadcount;
+      if (u.postcount   !== undefined) document.getElementById('posts').value   = u.postcount;
+      if (u.reputation  !== undefined) document.getElementById('rep').value     = u.reputation;
+      if (u.bytes       !== undefined) document.getElementById('bytes').value   = u.bytes;
+      if (u.lastpost)    document.getElementById('lastpost').value = u.lastpost;
+      if (u.usergrouptitle) document.getElementById('rank').value  = u.usergrouptitle;
+      if (u.online !== undefined) setStatus(u.online ? 'online' : 'offline');
+      if (u.avatar) document.getElementById('avatarurl').value = u.avatar;
+      setApiStatus('ok', `Loaded live stats for UID ${uid}`);
+      renderCard();
+    } else { throw new Error('Unexpected API response'); }
+  } catch (e) {
+    setApiStatus('err', `API error: ${e.message}`);
+  }
+}
+
+['username','threads','posts','rep','bytes','lastpost','tagline','rank'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderCard);
+});
+document.getElementById('avatarurl').addEventListener('change', renderCard);
+
+renderCard();
+</script>
+</body>
+</html>
